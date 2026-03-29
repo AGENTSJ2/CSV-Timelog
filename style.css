@@ -1,0 +1,108 @@
+/* Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* Modern system fonts that look great on any OS */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f7f6;
+  color: #333;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* Main Container Card */
+.container {
+  background: #ffffff;
+  width: 100%;
+  max-width: 600px;
+  padding: 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+header h2 {
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-size: 1.75rem;
+}
+
+header p {
+  color: #7f8c8d;
+  font-size: 0.95rem;
+}
+
+/* Upload Section */
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+input[type="file"] {
+  padding: 1rem;
+  border: 2px dashed #bdc3c7;
+  border-radius: 6px;
+  background-color: #fafbfc;
+  cursor: pointer;
+  color: #555;
+  transition: border-color 0.2s ease;
+}
+
+input[type="file"]:hover {
+  border-color: #3498db;
+}
+
+/* Button */
+.primary-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 0.85rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  font-weight: 600;
+}
+
+.primary-btn:hover {
+  background-color: #2980b9;
+}
+
+.primary-btn:active {
+  transform: scale(0.98);
+}
+
+/* Output Section */
+.output-section h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: #2c3e50;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 0.5rem;
+}
+
+#output {
+  background-color: #282a36; /* Dark theme for code */
+  color: #f8f8f2;
+  padding: 1.25rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  min-height: 120px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
