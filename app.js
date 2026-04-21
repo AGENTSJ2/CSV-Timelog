@@ -22,7 +22,20 @@ const outputHeaders = [
   "Parent Id",
   "Parent Title",
 ];
-
+const Months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 function transformToOutputStructure(rows) {
   return rows.map((row) => {
     const transformed = {};
@@ -45,7 +58,63 @@ function transformToOutputStructure(rows) {
     return transformed;
   });
 }
+const weeklyMap = new Map();
+function getWeeklyFormateString(rows, workItemIdsToExclude) {
+  rows.map((row) => {
+    const workItemId = row["workItemId"];
+    if (workItemIdsToExclude.include(workItemId)) {
+      return;
+    }
+    const title = row["title"];
+    const comment = row["comment"];
+    const date = row["date"];
+    let dispString = `[${workItemId}] [${title}] - ${comment}`;
+    const weekKey = getWeekRange(date);
 
+    let weeklyArray = weeklyMap.get(weekKey);
+
+    if (weeklyArray == undefined) {
+      weeklyMap.set(weekKey, [dispString]);
+    } else {
+      weeklyArray.push(dispString);
+    }
+  });
+  const sorted = Array.from(weeklyMap.entries()).sort(([keyA], [keyB]) => {
+    const startA = new Date(keyA.split("|")[0]).getTime();
+    const startB = new Date(keyB.split("|")[0]).getTime();
+    return startA - startB; // ascending
+  });
+  let markDownString = "";
+  for (let i = 0; i < sorted.length; i++) {
+    const week = sorted[i];
+    const times = week[0].split("|");
+    const start = new Date(times[0]);
+    const end = new Date(times[1]);
+    markDownString += `\n ## Week ${Months[start.getMonth()]} ${start.getDate()} ${start.getFullYear()} - ${Months[end.getMonth()]} ${end.getDate()} ${end.getFullYear()}\n`;
+    const works = week[1];
+    works.forEach((taskString) => {
+      markDownString += `\n - ${taskString}\n`;
+    });
+  }
+  return markDownString;
+}
+function getWeekRange(dateInput) {
+  const date = new Date(dateInput);
+  const day = date.getDay(); // 0 (Sun) → 6 (Sat)
+
+  // Convert Sunday (0) to 7 for ISO consistency
+  const isoDay = day === 0 ? 7 : day;
+
+  const start = new Date(date);
+  start.setDate(date.getDate() - isoDay + 1); // Monday
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6); // Sunday
+  end.setHours(23, 59, 59, 999);
+
+  return `${start.toISOString()}|${end.toISOString()}`;
+}
 function getOutputActivityType(inputType) {
   switch (inputType) {
     case "Meeting":
@@ -66,6 +135,15 @@ function getOutputActivityType(inputType) {
 function getCommentFromInputType(inputType) {
   return inputType === "Bug Fixing" ? "Bug" : "User Story";
 }
+function parseIds() {
+  const raw = document.getElementById("taskInput").value;
+
+  const ids = raw
+    .split(/[\s,]+/) // split by space, comma, newline
+    .map((s) => s.trim())
+    .filter(Boolean);
+  return ids ?? [];
+}
 
 function handleProcess() {
   const file = document.getElementById("fileInput").files[0];
@@ -83,16 +161,7 @@ function handleProcess() {
       try {
         const parsed = results.data;
         const transformed = transformToOutputStructure(parsed);
-
-        // Update UI
-        const outputDiv = document.getElementById("output");
-        if (outputDiv) {
-          outputDiv.textContent = JSON.stringify(transformed, null, 2);
-        }
-
-        // Use Papa.unparse to convert JSON back to CSV
-        // The `columns` config ensures the columns are strictly ordered
-        // as per your outputHeaders array
+        
         const csv = Papa.unparse(transformed, {
           columns: outputHeaders,
           quotes: true, // Safely wraps fields with newlines/commas in quotes
@@ -109,7 +178,15 @@ function handleProcess() {
     },
   });
 }
-
+updateWeeklyPreview(parsed);
+{
+  const md = getWeeklyFormateString(parsed);
+  // Update UI
+  const outputDiv = document.getElementById("output");
+  if (outputDiv) {
+    outputDiv.innerHTML = marked.parse(md);
+  }
+}
 function downloadCSV(csv) {
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
