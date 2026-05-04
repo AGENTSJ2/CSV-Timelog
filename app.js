@@ -60,15 +60,17 @@ function transformToOutputStructure(rows) {
 }
 const weeklyMap = new Map();
 function getWeeklyFormateString(rows, workItemIdsToExclude) {
+  
   rows.map((row) => {
     const workItemId = row["workItemId"];
-    if (workItemIdsToExclude.include(workItemId)) {
-      return;
+    if(workItemIdsToExclude.includes(workItemId))
+    {
+      return "";
     }
     const title = row["title"];
     const comment = row["comment"];
     const date = row["date"];
-    let dispString = `[${workItemId}] [${title}] - ${comment}`;
+    let dispString = `Worked on [${workItemId}] ${title} - ${comment}`;
     const weekKey = getWeekRange(date);
 
     let weeklyArray = weeklyMap.get(weekKey);
@@ -93,7 +95,7 @@ function getWeeklyFormateString(rows, workItemIdsToExclude) {
     markDownString += `\n ## Week ${Months[start.getMonth()]} ${start.getDate()} ${start.getFullYear()} - ${Months[end.getMonth()]} ${end.getDate()} ${end.getFullYear()}\n`;
     const works = week[1];
     works.forEach((taskString) => {
-      markDownString += `\n - ${taskString}\n`;
+      markDownString += `- ${taskString}\n`;
     });
   }
   return markDownString;
@@ -137,7 +139,6 @@ function getCommentFromInputType(inputType) {
 }
 function parseIds() {
   const raw = document.getElementById("taskInput").value;
-
   const ids = raw
     .split(/[\s,]+/) // split by space, comma, newline
     .map((s) => s.trim())
@@ -145,7 +146,7 @@ function parseIds() {
   return ids ?? [];
 }
 
-function handleProcess() {
+function handleProcess(download) {
   const file = document.getElementById("fileInput").files[0];
 
   if (!file) {
@@ -161,13 +162,15 @@ function handleProcess() {
       try {
         const parsed = results.data;
         const transformed = transformToOutputStructure(parsed);
-        
+        updateWeeklyPreview(parsed);
         const csv = Papa.unparse(transformed, {
           columns: outputHeaders,
           quotes: true, // Safely wraps fields with newlines/commas in quotes
         });
-
-        downloadCSV(csv);
+        if(download)
+        {
+          downloadCSV(csv);
+        }
       } catch (err) {
         console.error("Error during transformation/export:", err);
       }
@@ -178,9 +181,10 @@ function handleProcess() {
     },
   });
 }
-updateWeeklyPreview(parsed);
+function updateWeeklyPreview(parsed)
 {
-  const md = getWeeklyFormateString(parsed);
+  const ids = parseIds();
+  const md = getWeeklyFormateString(parsed,ids);
   // Update UI
   const outputDiv = document.getElementById("output");
   if (outputDiv) {

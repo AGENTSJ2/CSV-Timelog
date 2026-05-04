@@ -20,7 +20,7 @@
 
     <div class="upload-section">
       <input type="file" id="fileInput" accept=".csv" />
-      <button id="processBtn" class="primary-btn">Process CSV</button>
+      <button id="processBtn" class="primary-btn" onclick="handleProcess(true)">Process CSV</button>
     </div>
 
     <div class="output-section">
@@ -28,7 +28,7 @@
         <h3>Weekly Preview</h3>
         <div class="workItemIdIp">
           <input id="taskInput" placeholder="Enter IDs (comma / space / newline separated)" />
-          <button class="updateBtn" onclick="parseIds()">Update</button>
+          <button class="updateBtn" onclick="handleProcess(false)">Update</button>
         </div>
       </div>
       <div id="output">Your transformed data will appear here...</div>
