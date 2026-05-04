@@ -8,24 +8,44 @@
   <link rel="stylesheet" href="style.css" />
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
   <main class="container">
-    <header>
-      <h2>CSV Transformer</h2>
-      <p>Upload your raw CSV to format and download the transformed version.</p>
+    <header class="app-header">
+      <div>
+        <span class="eyebrow">CSV Utility</span>
+        <h1>CSV Transformer</h1>
+        <p>Format raw time data, review the weekly summary, and download a clean export.</p>
+      </div>
     </header>
 
-    <div class="upload-section">
+    <section class="panel upload-section" aria-label="Upload CSV">
+      <label class="file-drop" for="fileInput">
+        <span class="file-icon" aria-hidden="true">CSV</span>
+        <span>
+          <strong>Choose a CSV file</strong>
+          <small id="fileName">No file selected</small>
+        </span>
+      </label>
       <input type="file" id="fileInput" accept=".csv" />
-      <button id="processBtn" class="primary-btn">Process CSV</button>
-    </div>
+      <button id="processBtn" class="primary-btn" type="button">Process CSV</button>
+    </section>
 
-    <div class="output-section">
-      <h3>JSON Preview</h3>
-      <pre id="output">Your transformed data will appear here...</pre>
-    </div>
+    <section class="panel output-section" aria-label="Weekly preview">
+      <div class="weekly">
+        <div>
+          <span class="section-kicker">Preview</span>
+          <h2>Weekly Summary</h2>
+        </div>
+        <div class="workItemIdIp">
+          <input id="taskInput" placeholder="Exclude IDs" aria-label="Work item IDs to exclude" />
+          <button id="updateBtn" class="secondary-btn" type="button">Update</button>
+        </div>
+      </div>
+      <div id="output">Your transformed data will appear here...</div>
+    </section>
   </main>
 
   <script src="app.js"></script>
