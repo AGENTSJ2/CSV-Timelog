@@ -60,6 +60,7 @@ function transformToOutputStructure(rows) {
 }
 const weeklyMap = new Map();
 function getWeeklyFormateString(rows, workItemIdsToExclude) {
+  weeklyMap.clear();
   rows.map((row) => {
     const workItemId = row["workItemId"];
     if (workItemIdsToExclude.includes(workItemId)) {
@@ -98,7 +99,7 @@ function getWeeklyFormateString(rows, workItemIdsToExclude) {
     workMap.entries().forEach((workEntry) => {
       const workTitle = workEntry[0];
       const workComments = workEntry[1];
-      markDownString += `#### Worked on ${workTitle}`
+      markDownString += `#### Worked on ${workTitle}\n`;
       workComments.forEach((comment)=>{
         markDownString+= `- ${comment}\n`
       })
@@ -194,7 +195,7 @@ function updateWeeklyPreview(parsed) {
   // Update UI
   const outputDiv = document.getElementById("output");
   if (outputDiv) {
-    outputDiv.innerHTML = marked.parse(md);
+    outputDiv.innerHTML = md ? marked.parse(md) : "";
   }
 }
 function downloadCSV(csv) {
@@ -211,5 +212,12 @@ function downloadCSV(csv) {
   URL.revokeObjectURL(url);
 }
 
-// UI handler
-document.getElementById("processBtn").addEventListener("click", handleProcess);
+document.getElementById("processBtn").addEventListener("click", () => handleProcess(true));
+document.getElementById("updateBtn").addEventListener("click", () => handleProcess(false));
+document.getElementById("fileInput").addEventListener("change", (event) => {
+  const fileName = document.getElementById("fileName");
+  const file = event.target.files[0];
+  if (fileName) {
+    fileName.textContent = file ? file.name : "No file selected";
+  }
+});
