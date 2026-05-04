@@ -86,8 +86,6 @@ function getWeeklyFormateString(rows, workItemIdsToExclude) {
     const startB = new Date(keyB.split("|")[0]).getTime();
     return startA - startB; // ascending
   });
-  // console.log(sorted);
-  
   let markDownString = "";
   for (let i = 0; i < sorted.length; i++) {
     const week = sorted[i];
@@ -105,8 +103,6 @@ function getWeeklyFormateString(rows, workItemIdsToExclude) {
       })
     });
   }
-  console.log(markDownString);
-  
   return markDownString;
 }
 function getWeekRange(dateInput) {
