@@ -60,11 +60,9 @@ function transformToOutputStructure(rows) {
 }
 const weeklyMap = new Map();
 function getWeeklyFormateString(rows, workItemIdsToExclude) {
-  
   rows.map((row) => {
     const workItemId = row["workItemId"];
-    if(workItemIdsToExclude.includes(workItemId))
-    {
+    if (workItemIdsToExclude.includes(workItemId)) {
       return "";
     }
     const title = row["title"];
@@ -73,12 +71,13 @@ function getWeeklyFormateString(rows, workItemIdsToExclude) {
     let dispString = `Worked on [${workItemId}] ${title} - ${comment}`;
     const weekKey = getWeekRange(date);
 
-    let weeklyArray = weeklyMap.get(weekKey);
+    let workMap = weeklyMap.get(weekKey);
 
-    if (weeklyArray == undefined) {
-      weeklyMap.set(weekKey, [dispString]);
+    if (workMap == undefined) {
+      weeklyMap.set(weekKey, new Map([[`[${workItemId}] ${title}`, [comment]]]));
     } else {
-      weeklyArray.push(dispString);
+      const workCommentArray = workMap.get(`[${workItemId}] ${title}`);
+      workCommentArray ? workCommentArray.push(comment) : workMap.set(`[${workItemId}] ${title}`,[comment]);
     }
   });
   const sorted = Array.from(weeklyMap.entries()).sort(([keyA], [keyB]) => {
@@ -86,18 +85,27 @@ function getWeeklyFormateString(rows, workItemIdsToExclude) {
     const startB = new Date(keyB.split("|")[0]).getTime();
     return startA - startB; // ascending
   });
+  // console.log(sorted);
+  
   let markDownString = "";
   for (let i = 0; i < sorted.length; i++) {
     const week = sorted[i];
     const times = week[0].split("|");
     const start = new Date(times[0]);
     const end = new Date(times[1]);
-    markDownString += `\n ## Week ${Months[start.getMonth()]} ${start.getDate()} ${start.getFullYear()} - ${Months[end.getMonth()]} ${end.getDate()} ${end.getFullYear()}\n`;
-    const works = week[1];
-    works.forEach((taskString) => {
-      markDownString += `- ${taskString}\n`;
+    markDownString += `\n## Week ${Months[start.getMonth()]} ${start.getDate()} ${start.getFullYear()} - ${Months[end.getMonth()]} ${end.getDate()} ${end.getFullYear()}\n`;
+    const workMap = week[1];
+    workMap.entries().forEach((workEntry) => {
+      const workTitle = workEntry[0];
+      const workComments = workEntry[1];
+      markDownString += `#### Worked on ${workTitle}`
+      workComments.forEach((comment)=>{
+        markDownString+= `- ${comment}\n`
+      })
     });
   }
+  console.log(markDownString);
+  
   return markDownString;
 }
 function getWeekRange(dateInput) {
@@ -167,8 +175,7 @@ function handleProcess(download) {
           columns: outputHeaders,
           quotes: true, // Safely wraps fields with newlines/commas in quotes
         });
-        if(download)
-        {
+        if (download) {
           downloadCSV(csv);
         }
       } catch (err) {
@@ -181,10 +188,9 @@ function handleProcess(download) {
     },
   });
 }
-function updateWeeklyPreview(parsed)
-{
+function updateWeeklyPreview(parsed) {
   const ids = parseIds();
-  const md = getWeeklyFormateString(parsed,ids);
+  const md = getWeeklyFormateString(parsed, ids);
   // Update UI
   const outputDiv = document.getElementById("output");
   if (outputDiv) {
