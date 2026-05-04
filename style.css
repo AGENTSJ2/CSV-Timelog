@@ -164,6 +164,7 @@ input[type="file"] {
 }
 
 .primary-btn {
+  height: 100%;
   min-height: 52px;
   padding: 0 22px;
   background: var(--primary);

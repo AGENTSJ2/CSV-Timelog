@@ -75,10 +75,15 @@ function getWeeklyFormateString(rows, workItemIdsToExclude) {
     let workMap = weeklyMap.get(weekKey);
 
     if (workMap == undefined) {
-      weeklyMap.set(weekKey, new Map([[`[${workItemId}] ${title}`, [comment]]]));
+      weeklyMap.set(
+        weekKey,
+        new Map([[`[${workItemId}] ${title}`, [comment]]]),
+      );
     } else {
       const workCommentArray = workMap.get(`[${workItemId}] ${title}`);
-      workCommentArray ? workCommentArray.push(comment) : workMap.set(`[${workItemId}] ${title}`,[comment]);
+      workCommentArray
+        ? workCommentArray.push(comment)
+        : workMap.set(`[${workItemId}] ${title}`, [comment]);
     }
   });
   const sorted = Array.from(weeklyMap.entries()).sort(([keyA], [keyB]) => {
@@ -86,8 +91,6 @@ function getWeeklyFormateString(rows, workItemIdsToExclude) {
     const startB = new Date(keyB.split("|")[0]).getTime();
     return startA - startB; // ascending
   });
-  // console.log(sorted);
-  
   let markDownString = "";
   for (let i = 0; i < sorted.length; i++) {
     const week = sorted[i];
@@ -100,13 +103,11 @@ function getWeeklyFormateString(rows, workItemIdsToExclude) {
       const workTitle = workEntry[0];
       const workComments = workEntry[1];
       markDownString += `#### Worked on ${workTitle}\n`;
-      workComments.forEach((comment)=>{
-        markDownString+= `- ${comment}\n`
-      })
+      workComments.forEach((comment) => {
+        markDownString += `- ${comment}\n`;
+      });
     });
   }
-  console.log(markDownString);
-  
   return markDownString;
 }
 function getWeekRange(dateInput) {
@@ -211,9 +212,32 @@ function downloadCSV(csv) {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+async function copyRichContent() {
+  const el = document.getElementById('output');
+  if (!el) return;
 
-document.getElementById("processBtn").addEventListener("click", () => handleProcess(true));
-document.getElementById("updateBtn").addEventListener("click", () => handleProcess(false));
+  const html = el.innerHTML;
+  const text = el.innerText;
+
+  const blobHtml = new Blob([html], { type: 'text/html' });
+  const blobText = new Blob([text], { type: 'text/plain' });
+
+  const data = new ClipboardItem({
+    'text/html': blobHtml,
+    'text/plain': blobText
+  });
+
+  await navigator.clipboard.write([data]);
+}
+document
+  .getElementById("processBtn")
+  .addEventListener("click", () => handleProcess(true));
+document
+  .getElementById("updateBtn")
+  .addEventListener("click", () => handleProcess(false));
+document
+  .getElementById("copyBtn")
+  .addEventListener("click", () => copyRichContent());
 document.getElementById("fileInput").addEventListener("change", (event) => {
   const fileName = document.getElementById("fileName");
   const file = event.target.files[0];
