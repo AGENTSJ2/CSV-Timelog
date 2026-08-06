@@ -1,0 +1,44 @@
+<main class="container">
+  <header class="app-header">
+    <div>
+      <span class="eyebrow">CSV Utility</span>
+      <h1>CSV Transformer</h1>
+      <p>
+        Format raw time data, narrow it down by project, user or keyword, review the weekly
+        summary, and download a clean export.
+      </p>
+    </div>
+  </header>
+
+  <section class="panel upload-section" aria-label="Upload CSV">
+    <app-file-upload
+      [fileName]="store.fileName()"
+      [status]="store.status()"
+      [errorMessage]="store.errorMessage()"
+      [canExport]="store.filteredRows().length > 0"
+      [exportLabel]="exportLabel()"
+      (fileSelected)="onFileSelected($event)"
+      (exportRequested)="store.exportCsv()"
+    />
+  </section>
+
+  <section class="panel filter-section" aria-label="Filters">
+    <app-filter-panel
+      [filter]="store.filter()"
+      [projectOptions]="store.projectOptions()"
+      [userOptions]="store.userOptions()"
+      [disabled]="!store.hasData()"
+      [canReset]="store.isFilterActive()"
+      (filterChange)="onFilterChange($event)"
+      (resetRequested)="store.resetFilter()"
+    />
+  </section>
+
+  <section class="panel output-section" aria-label="Weekly preview">
+    <app-weekly-preview
+      [html]="store.previewHtml()"
+      [stats]="store.stats()"
+      [hasData]="store.hasData()"
+    />
+  </section>
+</main>

@@ -1,0 +1,74 @@
+<div class="filter-head">
+  <div>
+    <span class="section-kicker">Filters</span>
+    <h2>Narrow the export</h2>
+  </div>
+
+  <button
+    class="secondary-btn"
+    type="button"
+    [disabled]="!canReset()"
+    (click)="resetRequested.emit()"
+  >
+    Reset
+  </button>
+</div>
+
+<div class="filter-grid">
+  <app-multi-select
+    label="Project"
+    placeholder="All projects"
+    [options]="projectOptions()"
+    [disabled]="disabled()"
+    [value]="filter().projects"
+    (valueChange)="onProjectsChange($event)"
+  />
+
+  <app-multi-select
+    label="User"
+    placeholder="All users"
+    [options]="userOptions()"
+    [disabled]="disabled()"
+    [value]="filter().users"
+    (valueChange)="onUsersChange($event)"
+  />
+
+  <div class="field">
+    <label class="field-label" for="keywordInput">Include keyword</label>
+    <input
+      id="keywordInput"
+      type="text"
+      placeholder="e.g. firebase, upload"
+      [disabled]="disabled()"
+      [value]="filter().includeKeyword"
+      (input)="onKeywordInput($event)"
+    />
+    <small class="field-hint">Matches title, comment, type or project. Comma-separate for any-of.</small>
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="includeIdsInput">Include work item IDs</label>
+    <input
+      id="includeIdsInput"
+      type="text"
+      placeholder="e.g. 1576 3023"
+      [disabled]="disabled()"
+      [value]="includeIdsDraft()"
+      (input)="onIncludeIdsInput($event)"
+    />
+    <small class="field-hint">Only these IDs are kept. Empty keeps everything.</small>
+  </div>
+
+  <div class="field">
+    <label class="field-label" for="excludeIdsInput">Exclude work item IDs</label>
+    <input
+      id="excludeIdsInput"
+      type="text"
+      placeholder="e.g. 1528"
+      [disabled]="disabled()"
+      [value]="excludeIdsDraft()"
+      (input)="onExcludeIdsInput($event)"
+    />
+    <small class="field-hint">Applied after include, so it always wins.</small>
+  </div>
+</div>

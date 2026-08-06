@@ -1,0 +1,34 @@
+<div class="preview-head">
+  <div>
+    <span class="section-kicker">Preview</span>
+    <h2>Weekly Summary</h2>
+  </div>
+
+  <div class="preview-actions">
+    @if (hasData()) {
+      <span class="stat-chip">
+        {{ stats().matchedRows }} / {{ stats().totalRows }} rows · {{ stats().hours }} h
+      </span>
+    }
+
+    <button class="secondary-btn" type="button" [disabled]="!html()" (click)="copy()">
+      @switch (copyState()) {
+        @case ('copied') { Copied }
+        @case ('failed') { Copy failed }
+        @default { Copy }
+      }
+    </button>
+  </div>
+</div>
+
+@if (html()) {
+  <div #output class="preview-body" [innerHTML]="html()"></div>
+} @else {
+  <div #output class="preview-body is-empty">
+    @if (hasData()) {
+      No rows match the current filters.
+    } @else {
+      Your transformed data will appear here…
+    }
+  </div>
+}
