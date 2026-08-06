@@ -1,0 +1,24 @@
+<label class="file-drop" for="fileInput">
+  <span class="file-icon" aria-hidden="true">CSV</span>
+  <span>
+    <strong>Choose a CSV file</strong>
+    <small>
+      @switch (status()) {
+        @case ('parsing') { Parsing… }
+        @case ('error') { {{ errorMessage() ?? 'Failed to parse the CSV file.' }} }
+        @default { {{ fileName() ?? 'No file selected' }} }
+      }
+    </small>
+  </span>
+</label>
+
+<input type="file" id="fileInput" accept=".csv" (change)="onFileChange($event)" />
+
+<button
+  class="primary-btn"
+  type="button"
+  [disabled]="!canExport()"
+  (click)="exportRequested.emit()"
+>
+  {{ exportLabel() }}
+</button>
